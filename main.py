@@ -1,6 +1,7 @@
 import re
 import apache_beam as beam
 from apache_beam.io import ReadFromText
+from apache_beam.io.textio import WriteToText
 from apache_beam.options.pipeline_options import PipelineOptions
 
 pipeline_options = PipelineOptions(argv=None)
@@ -143,7 +144,11 @@ result = (
     | 'Filter empty data' >> beam.Filter(filter_empty_fields)
     | 'Unpack elements' >> beam.Map(unpack_elements)
     | 'Prepare csv' >> beam.Map(prepare_csv)
-    | "Show union result" >> beam.Map(print)
+    #| "Show union result" >> beam.Map(print)
 )
+
+header = 'UF;ANO;MES;CHUVA;DENGUE'
+
+result | 'Create CSV file' >> WriteToText('result', file_name_suffix='.csv', header=header)
 
 pipeline.run()
